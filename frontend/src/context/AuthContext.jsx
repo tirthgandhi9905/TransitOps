@@ -1,38 +1,50 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect } from 'react'
+import { getMe } from '../api/auth'
+import { PAGE_ACCESS } from '../utils/constants'
 
-export const AuthContext = createContext();
+export const AuthContext = createContext()
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+export function AuthProvider({ children }) {
+  const [user, setUser]       = useState(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const email = localStorage.getItem('email');
-    const role = localStorage.getItem('role');
-    const token = localStorage.getItem('token');
-    if (token) {
-      setUser({ email, role });
-    }
-    setLoading(false);
-  }, []);
+    const token = localStorage.getItem('token')
+    if (!token) { setLoading(false); return }
 
-  const loginUser = (email, role, token) => {
-    localStorage.setItem('email', email);
-    localStorage.setItem('role', role);
-    localStorage.setItem('token', token);
-    setUser({ email, role });
-  };
+    getMe()
+      .then(res => setUser(res.data))
+      .catch(() => {
+        localStorage.removeItem('token')
+        setUser(null)
+      })
+      .finally(() => setLoading(false))
+  }, [])
+
+  const loginUser = (userData, token) => {
+    localStorage.setItem('token', token)
+    setUser(userData)
+  }
 
   const logoutUser = () => {
-    localStorage.removeItem('email');
-    localStorage.removeItem('role');
-    localStorage.removeItem('token');
-    setUser(null);
-  };
+    localStorage.removeItem('token')
+    setUser(null)
+  }
+
+  const canAccess = (page) => {
+    if (!user) return false
+    const access = PAGE_ACCESS[page]?.[user.role]
+    return access === 'full' || access === 'view'
+  }
+
+  const canEdit = (page) => {
+    if (!user) return false
+    return PAGE_ACCESS[page]?.[user.role] === 'full'
+  }
 
   return (
-    <AuthContext.Provider value={{ user, loading, loginUser, logoutUser }}>
+    <AuthContext.Provider value={{ user, loading, loginUser, logoutUser, canAccess, canEdit }}>
       {children}
     </AuthContext.Provider>
-  );
-};
+  )
+}
