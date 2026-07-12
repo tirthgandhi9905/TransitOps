@@ -1,30 +1,51 @@
 from pydantic import BaseModel, Field
-import datetime
 from typing import Optional
+from datetime import datetime, date
 
 class DriverBase(BaseModel):
     name: str
-    license_number: str
-    license_category: str
-    license_expiry: datetime.date
-    contact: str
-    safety_score: float = Field(default=100.0, ge=0, le=100)
-    status: str = "Available"  # 'Available', 'On Trip', 'Off Duty', 'Suspended'
+    licenseNumber: str = Field(..., alias="license_number")
+    licenseCategory: str = Field(..., alias="license_category")  # 'A', 'B', 'C', 'D', 'E'
+    licenseExpiry: date = Field(..., alias="license_expiry")
+    phone: str
+    email: Optional[str] = None
+    safetyScore: float = Field(default=10.0, alias="safety_score")
+    status: str = "AVAILABLE"  # 'AVAILABLE', 'ON_TRIP', 'OFF_DUTY', 'SUSPENDED'
+    notes: Optional[str] = None
+
+    class Config:
+        populate_by_name = True
+        allow_population_by_field_name = True
+        from_attributes = True
+        orm_mode = True
 
 class DriverCreate(DriverBase):
     pass
 
 class DriverUpdate(BaseModel):
     name: Optional[str] = None
-    license_number: Optional[str] = None
-    license_category: Optional[str] = None
-    license_expiry: Optional[datetime.date] = None
-    contact: Optional[str] = None
-    safety_score: Optional[float] = None
+    licenseNumber: Optional[str] = Field(default=None, alias="license_number")
+    licenseCategory: Optional[str] = Field(default=None, alias="license_category")
+    licenseExpiry: Optional[date] = Field(default=None, alias="license_expiry")
+    phone: Optional[str] = None
+    email: Optional[str] = None
+    safetyScore: Optional[float] = Field(default=None, alias="safety_score")
     status: Optional[str] = None
-
-class DriverResponse(DriverBase):
-    id: int
+    notes: Optional[str] = None
 
     class Config:
+        populate_by_name = True
+        allow_population_by_field_name = True
         from_attributes = True
+        orm_mode = True
+
+class DriverResponse(DriverBase):
+    id: str
+    createdAt: datetime = Field(..., alias="created_at")
+    updatedAt: datetime = Field(..., alias="updated_at")
+
+    class Config:
+        populate_by_name = True
+        allow_population_by_field_name = True
+        from_attributes = True
+        orm_mode = True

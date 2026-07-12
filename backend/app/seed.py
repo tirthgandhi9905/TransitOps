@@ -6,173 +6,161 @@ import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.database import SessionLocal, Base, engine
-from app.models.user import User
+from app.models.user import User, Role
 from app.models.vehicle import Vehicle
 from app.models.driver import Driver
 from app.models.trip import Trip
 from app.models.maintenance import MaintenanceLog
 from app.models.fuel_expense import FuelLog, Expense
 from app.core.security import get_password_hash
-from app.services.trip_service import TripService
-from app.services.maintenance_service import MaintenanceService
 
 def run_seed():
-    print("Initializing Database and dropping/creating tables...")
+    print("Resetting database...")
     Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
     
     db = SessionLocal()
     try:
-        print("\n--- Seeding Users (with roles) ---")
+        print("\n--- Seeding Roles ---")
+        roles = {
+            "Admin": Role(name="Admin"),
+            "Fleet Manager": Role(name="Fleet Manager"),
+            "Dispatcher": Role(name="Dispatcher"),
+            "Safety Officer": Role(name="Safety Officer"),
+            "Financial Analyst": Role(name="Financial Analyst")
+        }
+        db.add_all(roles.values())
+        db.commit()
+        for r in roles.values():
+            db.refresh(r)
+        print("Roles seeded.")
+
+        print("\n--- Seeding Demo Users ---")
         users = [
-            User(email="manager@transitops.com", hashed_password=get_password_hash("admin123"), role="Fleet Manager"),
-            User(email="driver@transitops.com", hashed_password=get_password_hash("driver123"), role="Driver"),
-            User(email="safety@transitops.com", hashed_password=get_password_hash("safety123"), role="Safety Officer"),
-            User(email="analyst@transitops.com", hashed_password=get_password_hash("analyst123"), role="Financial Analyst"),
+            User(name="Admin User", email="admin@transitops.com", password_hash=get_password_hash("password123"), role_id=roles["Admin"].id),
+            User(name="Fleet Mgr", email="fleet@transitops.com", password_hash=get_password_hash("password123"), role_id=roles["Fleet Manager"].id),
+            User(name="Dispatcher User", email="dispatch@transitops.com", password_hash=get_password_hash("password123"), role_id=roles["Dispatcher"].id),
+            User(name="Safety Officer User", email="safety@transitops.com", password_hash=get_password_hash("password123"), role_id=roles["Safety Officer"].id),
+            User(name="Financial Analyst User", email="finance@transitops.com", password_hash=get_password_hash("password123"), role_id=roles["Financial Analyst"].id),
         ]
         db.add_all(users)
         db.commit()
-        print("Seeded users successfully.")
+        for u in users:
+            db.refresh(u)
+        print("Users seeded.")
 
-        print("\n--- Seeding Vehicles & Drivers ---")
-        van = Vehicle(
-            registration_number="Van-05",
-            name_model="Ford Transit 2022",
-            type="Van",
-            max_load_capacity=500.0,  # kg
-            odometer=12000.0,
-            acquisition_cost=25000.0,
-            status="Available",
-            region="North"
-        )
-        truck = Vehicle(
-            registration_number="Truck-02",
-            name_model="Volvo FH16",
-            type="Truck",
-            max_load_capacity=5000.0,  # kg
-            odometer=85000.0,
-            acquisition_cost=95000.0,
-            status="Available",
-            region="South"
-        )
-        retired_flatbed = Vehicle(
-            registration_number="Flatbed-01",
-            name_model="Isuzu NPR",
-            type="Flatbed",
-            max_load_capacity=3000.0,  # kg
-            odometer=240000.0,
-            acquisition_cost=40000.0,
-            status="Retired",
-            region="East"
-        )
-        db.add_all([van, truck, retired_flatbed])
-        
-        driver_alex = Driver(
-            name="Alex",
-            license_number="DL-98234",
-            license_category="Class B",
-            license_expiry=datetime.date.today() + datetime.timedelta(days=365),
-            contact="+1-555-0101",
-            safety_score=95.0,
-            status="Available"
-        )
-        driver_sarah = Driver(
-            name="Sarah",
-            license_number="DL-88231",
-            license_category="Class A",
-            license_expiry=datetime.date.today() + datetime.timedelta(days=730),
-            contact="+1-555-0102",
-            safety_score=98.0,
-            status="Available"
-        )
-        driver_john = Driver(
-            name="John (Expired Licence)",
-            license_number="DL-77341",
-            license_category="Class B",
-            license_expiry=datetime.date.today() - datetime.timedelta(days=30),  # Expired
-            contact="+1-555-0103",
-            safety_score=85.0,
-            status="Available"
-        )
-        driver_robert = Driver(
-            name="Robert (Suspended)",
-            license_number="DL-66124",
-            license_category="Class A",
-            license_expiry=datetime.date.today() + datetime.timedelta(days=120),
-            contact="+1-555-0104",
-            safety_score=70.0,
-            status="Suspended"
-        )
-        db.add_all([driver_alex, driver_sarah, driver_john, driver_robert])
+        print("\n--- Seeding Vehicles ---")
+        vehicles = [
+            # 3 AVAILABLE
+            Vehicle(registration_number="VAN-01", vehicle_name="Ford Transit", vehicle_model="Transit 350", vehicle_type="VAN", max_load_capacity=1000.0, current_odometer=10000.0, acquisition_cost=30000.0, region="North", status="AVAILABLE"),
+            Vehicle(registration_number="VAN-02", vehicle_name="Mercedes Sprinter", vehicle_model="Sprinter 2500", vehicle_type="VAN", max_load_capacity=1200.0, current_odometer=15000.0, acquisition_cost=35000.0, region="East", status="AVAILABLE"),
+            Vehicle(registration_number="VAN-03", vehicle_name="Chevrolet Express", vehicle_model="Express 3500", vehicle_type="VAN", max_load_capacity=1500.0, current_odometer=20000.0, acquisition_cost=28000.0, region="West", status="AVAILABLE"),
+            # 2 ON_TRIP
+            Vehicle(registration_number="VAN-04", vehicle_name="Ford Transit", vehicle_model="Transit 150", vehicle_type="VAN", max_load_capacity=800.0, current_odometer=12000.0, acquisition_cost=25000.0, region="North", status="ON_TRIP"),
+            Vehicle(registration_number="VAN-05", vehicle_name="Mercedes Sprinter", vehicle_model="Sprinter 1500", vehicle_type="VAN", max_load_capacity=900.0, current_odometer=18000.0, acquisition_cost=33000.0, region="South", status="ON_TRIP"),
+            # 1 IN_SHOP
+            Vehicle(registration_number="TRUCK-01", vehicle_name="Volvo FH16", vehicle_model="FH16", vehicle_type="TRUCK", max_load_capacity=10000.0, current_odometer=80000.0, acquisition_cost=90000.0, region="South", status="IN_SHOP"),
+            # 2 RETIRED
+            Vehicle(registration_number="TRUCK-02", vehicle_name="Scania R500", vehicle_model="R500", vehicle_type="TRUCK", max_load_capacity=12000.0, current_odometer=250000.0, acquisition_cost=95000.0, region="East", status="RETIRED"),
+            Vehicle(registration_number="FLATBED-01", vehicle_name="Isuzu NPR", vehicle_model="NPR", vehicle_type="PICKUP", max_load_capacity=3000.0, current_odometer=180000.0, acquisition_cost=40000.0, region="West", status="RETIRED")
+        ]
+        db.add_all(vehicles)
         db.commit()
-        print("Seeded vehicles and drivers successfully.")
+        for v in vehicles:
+            db.refresh(v)
+        print("Vehicles seeded.")
 
-        # Run the demo workflow
-        print("\n--- Executing Example Workflow ---")
-        
-        # Step 1 & 2: Vehicle 'Van-05' (500kg max capacity) and Driver 'Alex' registered (completed above)
-        print("Step 1 & 2: Van-05 and Alex registered and Available.")
-        
-        # Step 3 & 4: Create trip with Cargo Weight = 450 kg (450 <= 500 holds)
-        print("Step 3: Creating a trip for Van-05 and Alex with cargo weight = 450 kg...")
-        trip = TripService.create_trip(
-            db=db,
-            source="Warehouse Alpha",
-            destination="Retail Center North",
-            vehicle_id=van.id,
-            driver_id=driver_alex.id,
-            cargo_weight=450.0,
-            planned_distance=100.0,
-            revenue=1200.0  # Assumed revenue for calculation
-        )
-        print(f"Trip created with status: {trip.status}")
+        print("\n--- Seeding Drivers ---")
+        drivers = [
+            # 3 AVAILABLE
+            Driver(name="Alex", license_number="DL-MH-001", license_category="B", license_expiry=datetime.date.today() + datetime.timedelta(days=365), phone="+91-9876543211", email="alex@transitops.com", safety_score=9.5, status="AVAILABLE"),
+            Driver(name="Sarah", license_number="DL-MH-002", license_category="C", license_expiry=datetime.date.today() + datetime.timedelta(days=730), phone="+91-9876543212", email="sarah@transitops.com", safety_score=9.8, status="AVAILABLE"),
+            Driver(name="John", license_number="DL-MH-003", license_category="B", license_expiry=datetime.date.today() + datetime.timedelta(days=120), phone="+91-9876543213", email="john@transitops.com", safety_score=8.5, status="AVAILABLE"),
+            # 1 ON_TRIP
+            Driver(name="Robert", license_number="DL-MH-004", license_category="C", license_expiry=datetime.date.today() + datetime.timedelta(days=150), phone="+91-9876543214", email="robert@transitops.com", safety_score=9.0, status="ON_TRIP"),
+            # 1 SUSPENDED
+            Driver(name="Michael", license_number="DL-MH-005", license_category="A", license_expiry=datetime.date.today() + datetime.timedelta(days=30), phone="+91-9876543215", email="michael@transitops.com", safety_score=6.0, status="SUSPENDED"),
+            # 1 OFF_DUTY
+            Driver(name="Emily", license_number="DL-MH-006", license_category="B", license_expiry=datetime.date.today() + datetime.timedelta(days=400), phone="+91-9876543216", email="emily@transitops.com", safety_score=8.8, status="OFF_DUTY")
+        ]
+        db.add_all(drivers)
+        db.commit()
+        for d in drivers:
+            db.refresh(d)
+        print("Drivers seeded.")
 
-        # Step 5: Dispatch trip -> vehicle + driver status auto 'On Trip'
-        print("Step 5: Dispatching the trip...")
-        trip = TripService.dispatch_trip(db, trip.id)
-        db.refresh(van)
-        db.refresh(driver_alex)
-        print(f"Trip status: {trip.status}")
-        print(f"Vehicle status: {van.status} (Expected: On Trip)")
-        print(f"Driver status: {driver_alex.status} (Expected: On Trip)")
+        print("\n--- Seeding Trips ---")
+        # 10 trips total
+        trips = [
+            Trip(trip_number="TRP-20240101-001", vehicle_id=vehicles[0].id, driver_id=drivers[0].id, source="Warehouse Alpha", destination="City Center", cargo_weight=450.0, planned_distance=50.0, revenue=1000.0, status="DRAFT", created_by_id=users[2].id),
+            Trip(trip_number="TRP-20240101-002", vehicle_id=vehicles[1].id, driver_id=drivers[1].id, source="Warehouse Beta", destination="Retail Hub", cargo_weight=800.0, planned_distance=120.0, revenue=2400.0, status="DRAFT", created_by_id=users[2].id),
+            
+            # Dispatched (vehicle and driver state matches seed state)
+            Trip(trip_number="TRP-20240101-003", vehicle_id=vehicles[3].id, driver_id=drivers[3].id, source="Dock East", destination="Outpost North", cargo_weight=500.0, planned_distance=300.0, revenue=6000.0, status="DISPATCHED", start_odometer=12000.0, dispatch_time=datetime.datetime.utcnow(), created_by_id=users[2].id),
+            Trip(trip_number="TRP-20240101-004", vehicle_id=vehicles[4].id, driver_id=drivers[3].id, source="Dock West", destination="Outpost South", cargo_weight=600.0, planned_distance=250.0, revenue=5000.0, status="DISPATCHED", start_odometer=18000.0, dispatch_time=datetime.datetime.utcnow(), created_by_id=users[2].id),
+            
+            # Completed
+            Trip(trip_number="TRP-20240101-005", vehicle_id=vehicles[0].id, driver_id=drivers[0].id, source="Warehouse Alpha", destination="Retail Center", cargo_weight=400.0, planned_distance=80.0, actual_distance=82.0, start_odometer=9918.0, end_odometer=10000.0, fuel_consumed=10.0, revenue=1600.0, status="COMPLETED", dispatch_time=datetime.datetime.utcnow() - datetime.timedelta(days=1), completion_time=datetime.datetime.utcnow() - datetime.timedelta(hours=20), created_by_id=users[2].id),
+            Trip(trip_number="TRP-20240101-006", vehicle_id=vehicles[1].id, driver_id=drivers[1].id, source="Warehouse Beta", destination="City Annex", cargo_weight=750.0, planned_distance=150.0, actual_distance=150.0, start_odometer=14850.0, end_odometer=15000.0, fuel_consumed=20.0, revenue=3000.0, status="COMPLETED", dispatch_time=datetime.datetime.utcnow() - datetime.timedelta(days=2), completion_time=datetime.datetime.utcnow() - datetime.timedelta(days=1), created_by_id=users[2].id),
+            Trip(trip_number="TRP-20240101-007", vehicle_id=vehicles[2].id, driver_id=drivers[2].id, source="Warehouse Gamma", destination="Docks", cargo_weight=900.0, planned_distance=60.0, actual_distance=58.0, start_odometer=19942.0, end_odometer=20000.0, fuel_consumed=7.5, revenue=1200.0, status="COMPLETED", dispatch_time=datetime.datetime.utcnow() - datetime.timedelta(days=3), completion_time=datetime.datetime.utcnow() - datetime.timedelta(days=2), created_by_id=users[2].id),
+            Trip(trip_number="TRP-20240101-008", vehicle_id=vehicles[0].id, driver_id=drivers[0].id, source="City Center", destination="Warehouse Alpha", cargo_weight=300.0, planned_distance=50.0, actual_distance=50.0, start_odometer=9868.0, end_odometer=9918.0, fuel_consumed=6.0, revenue=1000.0, status="COMPLETED", dispatch_time=datetime.datetime.utcnow() - datetime.timedelta(days=4), completion_time=datetime.datetime.utcnow() - datetime.timedelta(days=3), created_by_id=users[2].id),
+            
+            # Cancelled
+            Trip(trip_number="TRP-20240101-009", vehicle_id=vehicles[0].id, driver_id=drivers[0].id, source="Warehouse Alpha", destination="Outpost North", cargo_weight=450.0, planned_distance=100.0, revenue=2000.0, status="CANCELLED", created_by_id=users[2].id),
+            Trip(trip_number="TRP-20240101-010", vehicle_id=vehicles[1].id, driver_id=drivers[1].id, source="Warehouse Beta", destination="Outpost South", cargo_weight=500.0, planned_distance=110.0, revenue=2200.0, status="CANCELLED", created_by_id=users[2].id)
+        ]
+        db.add_all(trips)
+        db.commit()
+        for t in trips:
+            db.refresh(t)
+        print("Trips seeded.")
 
-        # Step 6 & 7: Complete trip -> Enter actual odometer (102km) and fuel consumed (8L)
-        print("Step 6: Completing the trip (actual distance = 102km, fuel consumed = 8L)...")
-        trip = TripService.complete_trip(
-            db=db,
-            trip_id=trip.id,
-            actual_distance=102.0,
-            fuel_consumed=8.0,
-            fuel_cost_per_liter=1.50
-        )
-        db.refresh(van)
-        db.refresh(driver_alex)
-        print(f"Step 7: Trip status: {trip.status} (Expected: Completed)")
-        print(f"Vehicle status: {van.status} (Expected: Available)")
-        print(f"Driver status: {driver_alex.status} (Expected: Available)")
-        print(f"Vehicle odometer: {van.odometer} km (Expected: 12102.0)")
+        print("\n--- Seeding Maintenance Logs ---")
+        # 5 maintenance logs
+        maint_logs = [
+            MaintenanceLog(vehicle_id=vehicles[5].id, maintenance_type="ENGINE_REPAIR", description="Overhaul transmission", cost=1500.0, vendor="Volvo Repair shop", status="ACTIVE", start_date=datetime.datetime.utcnow() - datetime.timedelta(days=9)), # > 7 days
+            MaintenanceLog(vehicle_id=vehicles[0].id, maintenance_type="OIL_CHANGE", description="Full synthetic oil change", cost=150.0, vendor="Jiffy Lube", status="COMPLETED", start_date=datetime.datetime.utcnow() - datetime.timedelta(days=20), end_date=datetime.datetime.utcnow() - datetime.timedelta(days=20)),
+            MaintenanceLog(vehicle_id=vehicles[1].id, maintenance_type="TIRE_REPLACEMENT", description="Replacing front passenger tire", cost=250.0, vendor="Discount Tire", status="COMPLETED", start_date=datetime.datetime.utcnow() - datetime.timedelta(days=15), end_date=datetime.datetime.utcnow() - datetime.timedelta(days=15)),
+            MaintenanceLog(vehicle_id=vehicles[2].id, maintenance_type="BRAKE_SERVICE", description="Brake pads replace", cost=300.0, vendor="Pep Boys", status="COMPLETED", start_date=datetime.datetime.utcnow() - datetime.timedelta(days=10), end_date=datetime.datetime.utcnow() - datetime.timedelta(days=10)),
+            MaintenanceLog(vehicle_id=vehicles[0].id, maintenance_type="AC_SERVICE", description="Freon recharge", cost=120.0, vendor="Jiffy Lube", status="COMPLETED", start_date=datetime.datetime.utcnow() - datetime.timedelta(days=5), end_date=datetime.datetime.utcnow() - datetime.timedelta(days=5))
+        ]
+        db.add_all(maint_logs)
+        db.commit()
+        print("Maintenance logs seeded.")
 
-        # Step 8: Create maintenance record Oil Change -> status In Shop
-        print("Step 8: Logging a Maintenance Log (Oil Change) for Van-05...")
-        maint_log = MaintenanceService.create_maintenance_log(
-            db=db,
-            vehicle_id=van.id,
-            description="Routine Oil Change and Brake Inspection",
-            cost=250.0,
-            date=datetime.date.today()
-        )
-        db.refresh(van)
-        print(f"Maintenance status: {maint_log.status} (Expected: Active)")
-        print(f"Vehicle status: {van.status} (Expected: In Shop)")
+        print("\n--- Seeding Fuel Logs ---")
+        # 15 fuel logs
+        fuel_logs = []
+        for i in range(15):
+            veh = vehicles[i % 5]
+            fuel_logs.append(FuelLog(
+                vehicle_id=veh.id,
+                fuel_liters=30.0 + (i * 2),
+                fuel_cost=2500.0 + (i * 150),
+                fuel_station="HP Station, North Gate",
+                date=datetime.datetime.utcnow() - datetime.timedelta(days=i)
+            ))
+        db.add_all(fuel_logs)
+        db.commit()
+        print("Fuel logs seeded.")
 
-        # Step 8.5: Close maintenance record -> status back to Available
-        print("Step 8.5: Closing the maintenance log...")
-        maint_log = MaintenanceService.close_maintenance_log(db, maint_log.id)
-        db.refresh(van)
-        print(f"Maintenance status: {maint_log.status} (Expected: Closed)")
-        print(f"Vehicle status: {van.status} (Expected: Available)")
+        print("\n--- Seeding Expenses ---")
+        # 10 expenses
+        expenses = []
+        for i in range(10):
+            veh = vehicles[i % 5]
+            expenses.append(Expense(
+                vehicle_id=veh.id,
+                expense_type="TOLL",
+                amount=100.0 + (i * 50),
+                description=f"Toll gate passage {i}",
+                expense_date=datetime.datetime.utcnow() - datetime.timedelta(days=i)
+            ))
+        db.add_all(expenses)
+        db.commit()
+        print("Expenses seeded.")
 
-        print("\n--- Example Workflow Completed Successfully! ---")
+        print("\n=== Seeding Completed Successfully ===")
         
     finally:
         db.close()

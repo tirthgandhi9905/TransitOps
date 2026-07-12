@@ -1,11 +1,6 @@
-from fastapi import HTTPException, status
-
-class ValidationError(Exception):
-    def __init__(self, message: str):
+class TransitOpsException(Exception):
+    def __init__(self, code: str, message: str, status_code: int = 422):
+        self.code = code
         self.message = message
-        super().__init__(self.message)
-
-class PermissionDeniedError(Exception):
-    def __init__(self, message: str = "Permission denied"):
-        self.message = message
+        self.status_code = status_code
         super().__init__(self.message)
