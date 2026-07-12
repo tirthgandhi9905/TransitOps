@@ -197,7 +197,7 @@ export default function Maintenance() {
             <Button
               size="icon" variant="ghost"
               onClick={() => setDeleting(row)}
-              className="hover:text-red-400"
+              className="hover:text-red-500 hover:bg-red-50"
             >
               ✕
             </Button>
@@ -211,15 +211,15 @@ export default function Maintenance() {
     <div className="space-y-4">
       {/* Toolbar */}
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex gap-1 bg-slate-800 rounded-lg p-1">
+        <div className="flex gap-1 bg-gray-100 rounded-xl p-1">
           {[{ label: 'All', value: '' }, { label: 'Active', value: 'ACTIVE' }, { label: 'Completed', value: 'COMPLETED' }].map(t => (
             <button
               key={t.value}
               onClick={() => { setStatusF(t.value); setPage(1) }}
               className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors
                 ${statusF === t.value
-                  ? 'bg-slate-700 text-slate-100'
-                  : 'text-slate-400 hover:text-slate-200'}`}
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-500 hover:text-gray-700'}`}
             >
               {t.label}
             </button>
@@ -231,7 +231,7 @@ export default function Maintenance() {
       </div>
 
       {/* Table */}
-      <div className="bg-slate-900 border border-slate-800 rounded-xl">
+      <div className="bg-white border border-surface-border rounded-xl shadow-card overflow-hidden">
         <Table
           columns={columns} data={records} loading={loading}
           emptyMessage="No maintenance records found."

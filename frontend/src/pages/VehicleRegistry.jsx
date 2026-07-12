@@ -151,7 +151,7 @@ export default function VehicleRegistry() {
       render:(_,row)=>(
         <div className="flex gap-1.5 justify-end">
           <Button size="icon" variant="ghost" onClick={()=>openEdit(row)}><Pencil size={14}/></Button>
-          <Button size="icon" variant="ghost" onClick={()=>setDeleting(row)} className="hover:text-red-400">
+          <Button size="icon" variant="ghost" onClick={()=>setDeleting(row)} className="hover:text-red-500">
             <Trash2 size={14}/>
           </Button>
         </div>
@@ -178,7 +178,7 @@ export default function VehicleRegistry() {
       </div>
 
       {/* Table card */}
-      <div className="bg-slate-900 border border-slate-800 rounded-xl">
+      <div className="bg-white border border-surface-border rounded-xl shadow-card overflow-hidden">
         <Table
           columns={columns} data={vehicles} loading={loading}
           emptyMessage="No vehicles found."

@@ -264,7 +264,7 @@ export default function FuelExpenses() {
     ...(editable ? [{
       key:'_del', label:'',
       render:(_,row)=>(
-        <Button size="icon" variant="ghost" onClick={()=>setDelFuel(row)} className="hover:text-red-400">
+        <Button size="icon" variant="ghost" onClick={()=>setDelFuel(row)} className="hover:text-red-500 hover:bg-red-50">
           <Trash2 size={14}/>
         </Button>
       )
@@ -286,7 +286,7 @@ export default function FuelExpenses() {
     ...(editable ? [{
       key:'_del', label:'',
       render:(_,row)=>(
-        <Button size="icon" variant="ghost" onClick={()=>setDelExp(row)} className="hover:text-red-400">
+        <Button size="icon" variant="ghost" onClick={()=>setDelExp(row)} className="hover:text-red-500 hover:bg-red-50">
           <Trash2 size={14}/>
         </Button>
       )
@@ -297,18 +297,18 @@ export default function FuelExpenses() {
     <div className="space-y-4">
       {/* Tabs + Add button */}
       <div className="flex items-center justify-between gap-3">
-        <div className="flex gap-1 bg-slate-800 rounded-lg p-1">
+        <div className="flex gap-1 bg-gray-100 rounded-xl p-1">
           <button
             onClick={() => setActiveTab('fuel')}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors
-              ${activeTab === 'fuel' ? 'bg-slate-700 text-slate-100' : 'text-slate-400 hover:text-slate-200'}`}
+              ${activeTab === 'fuel' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
           >
             <Fuel size={13}/> Fuel Logs
           </button>
           <button
             onClick={() => setActiveTab('expenses')}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors
-              ${activeTab === 'expenses' ? 'bg-slate-700 text-slate-100' : 'text-slate-400 hover:text-slate-200'}`}
+              ${activeTab === 'expenses' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
           >
             <Receipt size={13}/> Other Expenses
           </button>
@@ -322,7 +322,7 @@ export default function FuelExpenses() {
       </div>
 
       {/* Table */}
-      <div className="bg-slate-900 border border-slate-800 rounded-xl">
+      <div className="bg-white border border-surface-border rounded-xl shadow-card overflow-hidden">
         {activeTab === 'fuel' ? (
           <Table
             columns={fuelColumns} data={fuelLogs} loading={fuelLoading}

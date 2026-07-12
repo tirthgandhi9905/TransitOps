@@ -21,16 +21,14 @@ import { getAvailableDrivers  } from '../api/drivers'
 import { TRIP_STATUS } from '../utils/constants'
 import { formatDate, formatCurrency, formatNumber } from '../utils/helpers'
 
-// ─── Status tab config ────────────────────────────────────────────────────────
 const TABS = [
-  { label: 'All',        value: ''            },
-  { label: 'Draft',      value: 'DRAFT'       },
-  { label: 'Dispatched', value: 'DISPATCHED'  },
-  { label: 'Completed',  value: 'COMPLETED'   },
-  { label: 'Cancelled',  value: 'CANCELLED'   },
+  { label: 'All',        value: ''           },
+  { label: 'Draft',      value: 'DRAFT'      },
+  { label: 'Dispatched', value: 'DISPATCHED' },
+  { label: 'Completed',  value: 'COMPLETED'  },
+  { label: 'Cancelled',  value: 'CANCELLED'  },
 ]
 
-// ─── Create Trip — 3-step wizard ─────────────────────────────────────────────
 const STEP_LABELS = ['Route & Cargo', 'Select Vehicle', 'Select Driver']
 
 const TRIP_EMPTY = {
@@ -38,27 +36,28 @@ const TRIP_EMPTY = {
   revenue: '', notes: '', vehicleId: '', driverId: ''
 }
 
+// ── Step indicator ──────────────────────────────────────────────────────────
 function StepIndicator({ current }) {
   return (
     <div className="flex items-center justify-between mb-6">
       {STEP_LABELS.map((label, i) => {
-        const step    = i + 1
-        const active  = step === current
-        const done    = step < current
+        const step   = i + 1
+        const active = step === current
+        const done   = step < current
         return (
           <React.Fragment key={step}>
             <div className="flex flex-col items-center gap-1">
               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-colors
-                ${done   ? 'bg-emerald-600 text-white'
-                : active ? 'bg-indigo-600 text-white'
-                :          'bg-slate-700 text-slate-400'}`}
+                ${done   ? 'bg-emerald-500 text-white'
+                : active ? 'bg-brand-600 text-white'
+                :          'bg-gray-200 text-gray-400'}`}
               >
                 {done ? <CheckCircle2 size={14}/> : step}
               </div>
-              <span className={`text-xs ${active ? 'text-slate-200' : 'text-slate-500'}`}>{label}</span>
+              <span className={`text-xs font-medium ${active ? 'text-gray-900' : 'text-gray-400'}`}>{label}</span>
             </div>
             {i < STEP_LABELS.length - 1 && (
-              <div className={`flex-1 h-px mx-2 mb-4 ${current > step ? 'bg-emerald-600' : 'bg-slate-700'}`} />
+              <div className={`flex-1 h-px mx-3 mb-4 ${current > step ? 'bg-emerald-400' : 'bg-gray-200'}`} />
             )}
           </React.Fragment>
         )
@@ -98,22 +97,17 @@ function Step1({ form, onChange, errors }) {
 
 function Step2({ form, onChange, errors, vehicles }) {
   const cargo    = parseFloat(form.cargoWeight) || 0
-  const selected = vehicles.find(v => v.id === form.vehicleId)
-
   return (
     <div className="space-y-4">
-      <p className="text-xs text-slate-400">
-        Cargo weight: <span className="text-slate-200 font-medium">{cargo} kg</span>.
-        Only AVAILABLE vehicles are shown.
+      <p className="text-xs text-gray-500 bg-gray-50 px-3 py-2 rounded-lg border border-gray-200">
+        Cargo weight: <span className="text-gray-800 font-semibold">{cargo} kg</span> · Only AVAILABLE vehicles shown
       </p>
 
-      {errors.vehicleId && (
-        <p className="text-xs text-red-400">{errors.vehicleId}</p>
-      )}
+      {errors.vehicleId && <p className="text-xs text-red-600">{errors.vehicleId}</p>}
 
       <div className="space-y-2 max-h-64 overflow-y-auto">
         {vehicles.length === 0 && (
-          <p className="text-slate-500 text-sm py-4 text-center">No available vehicles.</p>
+          <p className="text-gray-400 text-sm py-6 text-center">No available vehicles.</p>
         )}
         {vehicles.map(v => {
           const overload = cargo > v.maxLoadCapacity
@@ -123,27 +117,27 @@ function Step2({ form, onChange, errors, vehicles }) {
               key={v.id}
               onClick={() => !overload && onChange('vehicleId', v.id)}
               disabled={overload}
-              className={`w-full text-left p-3 rounded-lg border transition-all
+              className={`w-full text-left p-3 rounded-xl border-2 transition-all
                 ${chosen
-                  ? 'border-indigo-500 bg-indigo-500/10'
+                  ? 'border-brand-500 bg-brand-50'
                   : overload
-                    ? 'border-slate-700 bg-slate-800/30 opacity-50 cursor-not-allowed'
-                    : 'border-slate-700 bg-slate-800 hover:border-slate-600'
+                    ? 'border-gray-200 bg-gray-50 opacity-50 cursor-not-allowed'
+                    : 'border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50'
                 }`}
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Truck size={14} className="text-slate-400" />
-                  <span className="text-slate-200 text-sm font-medium">{v.registrationNumber}</span>
-                  <span className="text-slate-400 text-xs">{v.vehicleName}</span>
+                  <Truck size={14} className="text-gray-400" />
+                  <span className="text-gray-900 text-sm font-semibold font-mono">{v.registrationNumber}</span>
+                  <span className="text-gray-500 text-xs">{v.vehicleName}</span>
                 </div>
                 <div className="flex items-center gap-3 text-xs">
-                  <span className={overload ? 'text-red-400' : 'text-slate-400'}>
+                  <span className={overload ? 'text-red-600 font-medium' : 'text-gray-500'}>
                     <Scale size={11} className="inline mr-1"/>
                     {cargo}/{v.maxLoadCapacity} kg
-                    {overload && ' ⚠ Overload'}
+                    {overload && ' ⚠ Over capacity'}
                   </span>
-                  {chosen && <CheckCircle2 size={14} className="text-indigo-400"/>}
+                  {chosen && <CheckCircle2 size={14} className="text-brand-600"/>}
                 </div>
               </div>
             </button>
@@ -157,17 +151,15 @@ function Step2({ form, onChange, errors, vehicles }) {
 function Step3({ form, onChange, errors, drivers }) {
   return (
     <div className="space-y-4">
-      <p className="text-xs text-slate-400">
+      <p className="text-xs text-gray-500 bg-gray-50 px-3 py-2 rounded-lg border border-gray-200">
         Only AVAILABLE drivers with valid licenses are shown.
       </p>
 
-      {errors.driverId && (
-        <p className="text-xs text-red-400">{errors.driverId}</p>
-      )}
+      {errors.driverId && <p className="text-xs text-red-600">{errors.driverId}</p>}
 
       <div className="space-y-2 max-h-64 overflow-y-auto">
         {drivers.length === 0 && (
-          <p className="text-slate-500 text-sm py-4 text-center">No available drivers.</p>
+          <p className="text-gray-400 text-sm py-6 text-center">No available drivers.</p>
         )}
         {drivers.map(d => {
           const chosen = form.driverId === d.id
@@ -175,22 +167,22 @@ function Step3({ form, onChange, errors, drivers }) {
             <button
               key={d.id}
               onClick={() => onChange('driverId', d.id)}
-              className={`w-full text-left p-3 rounded-lg border transition-all
+              className={`w-full text-left p-3 rounded-xl border-2 transition-all
                 ${chosen
-                  ? 'border-indigo-500 bg-indigo-500/10'
-                  : 'border-slate-700 bg-slate-800 hover:border-slate-600'
+                  ? 'border-brand-500 bg-brand-50'
+                  : 'border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50'
                 }`}
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <User size={14} className="text-slate-400"/>
-                  <span className="text-slate-200 text-sm font-medium">{d.name}</span>
-                  <span className="text-slate-400 text-xs">{d.licenseNumber}</span>
+                  <User size={14} className="text-gray-400"/>
+                  <span className="text-gray-900 text-sm font-semibold">{d.name}</span>
+                  <span className="text-gray-400 text-xs font-mono">{d.licenseNumber}</span>
                 </div>
-                <div className="flex items-center gap-3 text-xs">
-                  <span className="text-slate-400">Cat. {d.licenseCategory}</span>
-                  <span className="text-slate-400">Exp: {formatDate(d.licenseExpiry)}</span>
-                  {chosen && <CheckCircle2 size={14} className="text-indigo-400"/>}
+                <div className="flex items-center gap-3 text-xs text-gray-500">
+                  <span>Cat. {d.licenseCategory}</span>
+                  <span>Exp: {formatDate(d.licenseExpiry)}</span>
+                  {chosen && <CheckCircle2 size={14} className="text-brand-600"/>}
                 </div>
               </div>
             </button>
@@ -201,7 +193,7 @@ function Step3({ form, onChange, errors, drivers }) {
   )
 }
 
-// ─── Complete Trip modal ──────────────────────────────────────────────────────
+// ── Complete Trip modal ────────────────────────────────────────────────────
 function CompleteModal({ isOpen, onClose, onConfirm, loading }) {
   const [data, setData] = useState({ endOdometer:'', fuelConsumed:'', actualDistance:'', notes:'' })
   const set = (k,v) => setData(d=>({...d,[k]:v}))
@@ -243,7 +235,7 @@ function CompleteModal({ isOpen, onClose, onConfirm, loading }) {
   )
 }
 
-// ─── Main page ────────────────────────────────────────────────────────────────
+// ── Main page ──────────────────────────────────────────────────────────────
 export default function TripManagement() {
   const { canEdit } = useAuth()
   const editable    = canEdit('Trips')
@@ -257,7 +249,7 @@ export default function TripManagement() {
   const [saving,       setSaving]       = useState(false)
   const [apiErr,       setApiErr]       = useState('')
 
-  const [completing,   setCompleting]   = useState(null)   // trip obj
+  const [completing,   setCompleting]   = useState(null)
   const [compLoading,  setCompLoading]  = useState(false)
   const [cancelling,   setCancelling]   = useState(null)
   const [cancelLoad,   setCancelLoad]   = useState(false)
@@ -280,14 +272,13 @@ export default function TripManagement() {
 
   const setField = (k,v) => setForm(f=>({...f,[k]:v}))
 
-  // Validation per step
   const validateStep = () => {
     const e = {}
     if (step === 1) {
-      if (!form.source.trim())        e.source        = 'Required'
-      if (!form.destination.trim())   e.destination   = 'Required'
-      if (!form.plannedDistance)      e.plannedDistance = 'Required'
-      if (!form.cargoWeight)          e.cargoWeight   = 'Required'
+      if (!form.source.trim())      e.source        = 'Required'
+      if (!form.destination.trim()) e.destination   = 'Required'
+      if (!form.plannedDistance)    e.plannedDistance = 'Required'
+      if (!form.cargoWeight)        e.cargoWeight   = 'Required'
     }
     if (step === 2 && !form.vehicleId) e.vehicleId = 'Select a vehicle'
     if (step === 3 && !form.driverId)  e.driverId  = 'Select a driver'
@@ -356,34 +347,34 @@ export default function TripManagement() {
   const columns = [
     { key:'source', label:'Route', render:(_,r)=>(
       <div>
-        <p className="text-slate-200 font-medium text-sm">{r.source} → {r.destination}</p>
-        <p className="text-xs text-slate-500 mt-0.5">
+        <p className="text-gray-900 font-medium text-sm">{r.source} → {r.destination}</p>
+        <p className="text-xs text-gray-400 mt-0.5 font-mono">
           {r.vehicle?.registrationNumber} · {r.driver?.name}
         </p>
       </div>
     )},
-    { key:'cargoWeight', label:'Cargo', render:v=>`${formatNumber(v)} kg`},
-    { key:'plannedDistance', label:'Distance', render:v=>v ? `${formatNumber(v)} km` : '—'},
-    { key:'revenue', label:'Revenue', render:v=>v ? formatCurrency(v) : '—'},
-    { key:'createdAt', label:'Created', render:v=>formatDate(v)},
-    { key:'status', label:'Status', render:v=><StatusBadge status={v}/>},
+    { key:'cargoWeight',     label:'Cargo',    render:v=><span className="tabular-nums">{formatNumber(v)} kg</span> },
+    { key:'plannedDistance', label:'Distance', render:v=>v ? <span className="tabular-nums">{formatNumber(v)} km</span> : '—' },
+    { key:'revenue',         label:'Revenue',  render:v=>v ? <span className="tabular-nums">{formatCurrency(v)}</span> : '—' },
+    { key:'createdAt',       label:'Created',  render:v=>formatDate(v) },
+    { key:'status',          label:'Status',   render:v=><StatusBadge status={v}/> },
     ...(editable ? [{
-      key:'_actions', label:'Actions',
+      key:'_actions', label:'',
       render:(_,row)=>(
         <div className="flex gap-1.5 justify-end flex-wrap">
           {row.status === TRIP_STATUS.DRAFT && (<>
             <Button size="sm" variant="primary" onClick={()=>setDispatching(row)}>
               <Send size={12}/> Dispatch
             </Button>
-            <Button size="sm" variant="ghost" onClick={()=>setDeleting(row)} className="hover:text-red-400">
-              <XCircle size={12}/>
+            <Button size="sm" variant="ghost" onClick={()=>setDeleting(row)} className="text-gray-400 hover:text-red-500 hover:bg-red-50">
+              <XCircle size={14}/>
             </Button>
           </>)}
           {row.status === TRIP_STATUS.DISPATCHED && (<>
             <Button size="sm" variant="success" onClick={()=>setCompleting(row)}>
               <CheckCircle2 size={12}/> Complete
             </Button>
-            <Button size="sm" variant="ghost" onClick={()=>setCancelling(row)} className="hover:text-red-400">
+            <Button size="sm" variant="ghost" onClick={()=>setCancelling(row)} className="text-gray-400 hover:text-red-500 hover:bg-red-50">
               <XCircle size={12}/> Cancel
             </Button>
           </>)}
@@ -395,17 +386,17 @@ export default function TripManagement() {
   return (
     <div className="space-y-4">
       {/* Toolbar */}
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex items-center justify-between gap-3 flex-wrap">
         {/* Status tabs */}
-        <div className="flex gap-1 bg-slate-800 rounded-lg p-1">
+        <div className="flex gap-1 bg-gray-100 rounded-xl p-1">
           {TABS.map(t => (
             <button
               key={t.value}
               onClick={()=>{ setTab(t.value); setPage(1) }}
-              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors
                 ${tab===t.value
-                  ? 'bg-slate-700 text-slate-100'
-                  : 'text-slate-400 hover:text-slate-200'}`}
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-500 hover:text-gray-700'}`}
             >
               {t.label}
             </button>
@@ -418,7 +409,7 @@ export default function TripManagement() {
       </div>
 
       {/* Table */}
-      <div className="bg-slate-900 border border-slate-800 rounded-xl">
+      <div className="bg-white border border-surface-border rounded-xl shadow-card overflow-hidden">
         <Table
           columns={columns} data={trips} loading={tripsLoading}
           emptyMessage="No trips found."
@@ -426,17 +417,12 @@ export default function TripManagement() {
         />
       </div>
 
-      {/* ── Create Trip Wizard Modal ── */}
-      <Modal
-        isOpen={showCreate}
-        onClose={()=>setShowCreate(false)}
-        title="New Trip"
-        size="lg"
-      >
+      {/* Create Trip Wizard */}
+      <Modal isOpen={showCreate} onClose={()=>setShowCreate(false)} title="New Trip" size="lg">
         <StepIndicator current={step}/>
 
         {apiErr && (
-          <div className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+          <div className="mb-4 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm">
             {apiErr}
           </div>
         )}
@@ -445,7 +431,7 @@ export default function TripManagement() {
         {step === 2 && <Step2 form={form} onChange={setField} errors={formErrors} vehicles={vehicles}/>}
         {step === 3 && <Step3 form={form} onChange={setField} errors={formErrors} drivers={drivers}/>}
 
-        <div className="flex justify-between mt-6">
+        <div className="flex justify-between mt-6 pt-4 border-t border-surface-border">
           <div>
             {step > 1 && (
               <Button variant="secondary" onClick={prevStep}>
@@ -463,15 +449,11 @@ export default function TripManagement() {
         </div>
       </Modal>
 
-      {/* ── Complete Trip Modal ── */}
       <CompleteModal
-        isOpen={!!completing}
-        onClose={()=>setCompleting(null)}
-        onConfirm={handleComplete}
-        loading={compLoading}
+        isOpen={!!completing} onClose={()=>setCompleting(null)}
+        onConfirm={handleComplete} loading={compLoading}
       />
 
-      {/* ── Dispatch confirm ── */}
       <ConfirmDialog
         isOpen={!!dispatching} onClose={()=>setDispatching(null)}
         onConfirm={handleDispatch} loading={dispatchLoad}
@@ -480,7 +462,6 @@ export default function TripManagement() {
         confirmLabel="Dispatch"
       />
 
-      {/* ── Cancel confirm ── */}
       <ConfirmDialog
         isOpen={!!cancelling} onClose={()=>setCancelling(null)}
         onConfirm={handleCancel} loading={cancelLoad}
@@ -489,7 +470,6 @@ export default function TripManagement() {
         confirmLabel="Cancel Trip"
       />
 
-      {/* ── Delete (draft only) ── */}
       <ConfirmDialog
         isOpen={!!deleting} onClose={()=>setDeleting(null)}
         onConfirm={handleDelete} loading={delLoad}

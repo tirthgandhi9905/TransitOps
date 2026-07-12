@@ -1,5 +1,5 @@
 import React from 'react'
-import { ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react'
+import { ChevronUp, ChevronDown, ChevronsUpDown, ChevronLeft, ChevronRight } from 'lucide-react'
 
 export default function Table({
   columns, data, loading, emptyMessage = 'No records found.',
@@ -7,26 +7,29 @@ export default function Table({
 }) {
   if (loading) {
     return (
-      <div className="space-y-2">
+      <div className="space-y-2 p-4">
         {[...Array(5)].map((_, i) => (
-          <div key={i} className="h-12 bg-slate-800 rounded animate-pulse" />
+          <div key={i} className="h-11 bg-gray-100 rounded-lg animate-pulse" />
         ))}
       </div>
     )
   }
 
   return (
-    <div className="overflow-hidden">
+    <div>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-slate-800">
+            <tr className="border-b border-surface-border bg-surface-muted">
               {columns.map(col => (
                 <th
                   key={col.key}
-                  className={`px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wide
-                    ${col.sortable ? 'cursor-pointer hover:text-slate-200 select-none' : ''}
-                    ${col.className || ''}`}
+                  className={`
+                    px-4 py-2.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide
+                    first:rounded-tl-none last:rounded-tr-none
+                    ${col.sortable ? 'cursor-pointer hover:text-gray-800 select-none' : ''}
+                    ${col.className || ''}
+                  `}
                   onClick={() => col.sortable && onSort?.(col.key)}
                 >
                   <span className="flex items-center gap-1">
@@ -34,27 +37,30 @@ export default function Table({
                     {col.sortable && (
                       sortBy === col.key
                         ? sortOrder === 'asc'
-                          ? <ChevronUp size={12} />
-                          : <ChevronDown size={12} />
-                        : <ChevronsUpDown size={12} className="opacity-40" />
+                          ? <ChevronUp size={11} className="text-brand-600" />
+                          : <ChevronDown size={11} className="text-brand-600" />
+                        : <ChevronsUpDown size={11} className="opacity-40" />
                     )}
                   </span>
                 </th>
               ))}
             </tr>
           </thead>
-          <tbody>
+          <tbody className="divide-y divide-surface-border">
             {!data?.length ? (
               <tr>
-                <td colSpan={columns.length} className="px-4 py-12 text-center text-slate-500">
-                  {emptyMessage}
+                <td colSpan={columns.length} className="px-4 py-14 text-center">
+                  <p className="text-gray-400 text-sm">{emptyMessage}</p>
                 </td>
               </tr>
             ) : data.map((row, i) => (
-              <tr key={row.id || i} className="border-b border-slate-800/50 hover:bg-slate-800/30 transition-colors">
+              <tr
+                key={row.id || i}
+                className="hover:bg-surface-muted/60 transition-colors"
+              >
                 {columns.map(col => (
-                  <td key={col.key} className={`px-4 py-3 text-slate-300 ${col.className || ''}`}>
-                    {col.render ? col.render(row[col.key], row) : row[col.key] ?? '—'}
+                  <td key={col.key} className={`px-4 py-3 text-gray-700 ${col.className || ''}`}>
+                    {col.render ? col.render(row[col.key], row) : (row[col.key] ?? <span className="text-gray-300">—</span>)}
                   </td>
                 ))}
               </tr>
@@ -64,19 +70,27 @@ export default function Table({
       </div>
 
       {totalPages > 1 && (
-        <div className="flex items-center justify-between px-4 py-3 border-t border-slate-800">
-          <p className="text-xs text-slate-500">Page {currentPage} of {totalPages}</p>
-          <div className="flex gap-2">
+        <div className="flex items-center justify-between px-4 py-3 border-t border-surface-border">
+          <p className="text-xs text-gray-400 tabular-nums">
+            Page {currentPage} of {totalPages}
+          </p>
+          <div className="flex items-center gap-1">
             <button
               onClick={() => onPageChange?.(currentPage - 1)}
               disabled={currentPage <= 1}
-              className="px-3 py-1 text-xs rounded bg-slate-800 text-slate-300 disabled:opacity-40 hover:bg-slate-700"
-            >Prev</button>
+              className="flex items-center gap-1 px-3 py-1.5 text-xs rounded-lg border border-surface-border
+                bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              <ChevronLeft size={12} /> Prev
+            </button>
             <button
               onClick={() => onPageChange?.(currentPage + 1)}
               disabled={currentPage >= totalPages}
-              className="px-3 py-1 text-xs rounded bg-slate-800 text-slate-300 disabled:opacity-40 hover:bg-slate-700"
-            >Next</button>
+              className="flex items-center gap-1 px-3 py-1.5 text-xs rounded-lg border border-surface-border
+                bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              Next <ChevronRight size={12} />
+            </button>
           </div>
         </div>
       )}

@@ -8,26 +8,37 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Brand
+        // Brand — pulled from the TransitOps logo purple
         brand: {
-          50:  '#eef2ff',
-          100: '#e0e7ff',
-          200: '#c7d2fe',
-          300: '#a5b4fc',
-          400: '#818cf8',
-          500: '#6366f1',  // primary indigo
-          600: '#4f46e5',
-          700: '#4338ca',
-          800: '#3730a3',
-          900: '#312e81',
+          50:  '#F6EEF8',
+          100: '#ECDCF2',
+          200: '#D5B4E5',
+          300: '#BB85D5',
+          400: '#A058C4',
+          500: '#8832B2',
+          600: '#7C2D84',   // ← primary (matches logo ring)
+          700: '#6A2470',
+          800: '#561C5C',
+          900: '#421548',
         },
-        // Surface (dark theme)
+        // Neutral surface palette (light theme)
         surface: {
-          DEFAULT: '#0f172a',  // slate-950 - page bg
-          card:    '#1e293b',  // slate-800 - card bg
-          border:  '#334155',  // slate-700 - borders
-          muted:   '#475569',  // slate-600 - muted text
+          page:   '#F4F6FA',   // page background
+          card:   '#FFFFFF',   // card / panel background
+          border: '#E4E8EF',   // dividers, card borders
+          muted:  '#F1F3F8',   // zebra rows, input bg
         },
+      },
+      boxShadow: {
+        card:  '0 1px 4px 0 rgba(17,24,39,0.06), 0 1px 2px 0 rgba(17,24,39,0.04)',
+        modal: '0 20px 60px -12px rgba(17,24,39,0.18)',
+        toast: '0 4px 16px 0 rgba(17,24,39,0.12)',
+      },
+      fontFamily: {
+        sans: [
+          'Inter', 'ui-sans-serif', '-apple-system', 'BlinkMacSystemFont',
+          'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif',
+        ],
       },
     },
   },

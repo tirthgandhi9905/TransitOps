@@ -146,17 +146,17 @@ export default function DriverManagement() {
   const columns = [
     { key:'name', label:'Driver', sortable:true, render:(v,r)=>(
       <div>
-        <p className="text-slate-200 font-medium">{v}</p>
-        <p className="text-xs text-slate-500">{r.licenseNumber}</p>
+        <p className="text-gray-900 font-medium">{v}</p>
+        <p className="text-xs text-gray-400">{r.licenseNumber}</p>
       </div>
     )},
     { key:'licenseCategory', label:'Category', render:v=>(
-      <span className="px-2 py-0.5 rounded bg-slate-700 text-slate-300 text-xs font-mono">{v}</span>
+      <span className="px-2 py-0.5 rounded-md bg-gray-100 text-gray-700 text-xs font-mono">{v}</span>
     )},
     { key:'licenseExpiry', label:'Expiry', render:v=><LicenseExpiry date={v} /> },
     { key:'safetyScore',   label:'Safety', render:v=>(
       <div className="flex items-center gap-1.5">
-        <ShieldCheck size={13} className="text-slate-500" />
+        <ShieldCheck size={13} className="text-gray-400" />
         <SafetyScore score={v} />
         <span className="text-slate-500 text-xs">/ 10</span>
       </div>
@@ -168,7 +168,7 @@ export default function DriverManagement() {
       render:(_,row)=>(
         <div className="flex gap-1.5 justify-end">
           <Button size="icon" variant="ghost" onClick={()=>openEdit(row)}><Pencil size={14}/></Button>
-          <Button size="icon" variant="ghost" onClick={()=>setDeleting(row)} className="hover:text-red-400">
+          <Button size="icon" variant="ghost" onClick={()=>setDeleting(row)} className="hover:text-red-500">
             <Trash2 size={14}/>
           </Button>
         </div>
@@ -191,7 +191,7 @@ export default function DriverManagement() {
         {editable && <Button onClick={openAdd}><Plus size={15}/>Add Driver</Button>}
       </div>
 
-      <div className="bg-slate-900 border border-slate-800 rounded-xl">
+      <div className="bg-white border border-surface-border rounded-xl shadow-card overflow-hidden">
         <Table
           columns={columns} data={drivers} loading={loading}
           emptyMessage="No drivers found."

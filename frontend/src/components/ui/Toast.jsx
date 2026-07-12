@@ -2,19 +2,41 @@ import React from 'react'
 import { CheckCircle, XCircle, AlertTriangle, Info, X } from 'lucide-react'
 
 const TYPES = {
-  success: { icon: CheckCircle, classes: 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' },
-  error:   { icon: XCircle,     classes: 'bg-red-500/10     border-red-500/20     text-red-400'     },
-  warning: { icon: AlertTriangle,classes: 'bg-amber-500/10  border-amber-500/20   text-amber-400'   },
-  info:    { icon: Info,         classes: 'bg-blue-500/10   border-blue-500/20    text-blue-400'    },
+  success: {
+    icon: CheckCircle,
+    classes: 'bg-white border-emerald-200 text-emerald-700',
+    iconClass: 'text-emerald-500',
+  },
+  error: {
+    icon: XCircle,
+    classes: 'bg-white border-red-200 text-red-700',
+    iconClass: 'text-red-500',
+  },
+  warning: {
+    icon: AlertTriangle,
+    classes: 'bg-white border-amber-200 text-amber-700',
+    iconClass: 'text-amber-500',
+  },
+  info: {
+    icon: Info,
+    classes: 'bg-white border-blue-200 text-blue-700',
+    iconClass: 'text-blue-500',
+  },
 }
 
 function Toast({ toast, onRemove }) {
-  const { icon: Icon, classes } = TYPES[toast.type] || TYPES.info
+  const { icon: Icon, classes, iconClass } = TYPES[toast.type] || TYPES.info
   return (
-    <div className={`flex items-start gap-3 p-3 rounded-lg border ${classes} shadow-lg max-w-sm`}>
-      <Icon size={16} className="mt-0.5 flex-shrink-0" />
-      <p className="text-sm flex-1 text-slate-200">{toast.message}</p>
-      <button onClick={() => onRemove(toast.id)} className="text-slate-400 hover:text-slate-200 flex-shrink-0">
+    <div className={`
+      flex items-start gap-3 p-3.5 rounded-xl border shadow-toast max-w-sm
+      ${classes}
+    `}>
+      <Icon size={16} className={`mt-0.5 flex-shrink-0 ${iconClass}`} />
+      <p className="text-sm flex-1 font-medium leading-snug">{toast.message}</p>
+      <button
+        onClick={() => onRemove(toast.id)}
+        className="text-current opacity-50 hover:opacity-100 flex-shrink-0 transition-opacity"
+      >
         <X size={14} />
       </button>
     </div>

@@ -7,7 +7,7 @@ export default function AppLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(true)
 
   return (
-    <div className="flex h-screen bg-slate-950 overflow-hidden">
+    <div className="flex h-screen bg-surface-page overflow-hidden">
       <Sidebar open={sidebarOpen} onToggle={() => setSidebarOpen(o => !o)} />
       <div className="flex flex-col flex-1 overflow-hidden">
         <Topbar onMenuClick={() => setSidebarOpen(o => !o)} />

@@ -44,22 +44,22 @@ export const PAGE_ACCESS = {
   Users:        { 'Fleet Manager': false,  Dispatcher: false,  'Safety Officer': false,  'Financial Analyst': false,  Admin: 'full' },
 }
 
-// Status → Tailwind color classes
+// Light-mode status badge classes — solid, high-contrast
 export const STATUS_BADGE_CLASSES = {
-  AVAILABLE:   'bg-emerald-500/20 text-emerald-400 ring-1 ring-emerald-500/30',
-  ON_TRIP:     'bg-indigo-500/20  text-indigo-400  ring-1 ring-indigo-500/30',
-  IN_SHOP:     'bg-amber-500/20   text-amber-400   ring-1 ring-amber-500/30',
-  RETIRED:     'bg-slate-500/20   text-slate-400   ring-1 ring-slate-500/30',
-  OFF_DUTY:    'bg-slate-500/20   text-slate-400   ring-1 ring-slate-500/30',
-  SUSPENDED:   'bg-red-500/20     text-red-400     ring-1 ring-red-500/30',
-  DRAFT:       'bg-slate-500/20   text-slate-400   ring-1 ring-slate-500/30',
-  DISPATCHED:  'bg-blue-500/20    text-blue-400    ring-1 ring-blue-500/30',
-  COMPLETED:   'bg-emerald-500/20 text-emerald-400 ring-1 ring-emerald-500/30',
-  CANCELLED:   'bg-red-500/20     text-red-400     ring-1 ring-red-500/30',
-  ACTIVE:      'bg-amber-500/20   text-amber-400   ring-1 ring-amber-500/30',
+  AVAILABLE:   'bg-emerald-50  text-emerald-700  ring-1 ring-emerald-200',
+  ON_TRIP:     'bg-brand-50    text-brand-700    ring-1 ring-brand-200',
+  IN_SHOP:     'bg-amber-50    text-amber-700    ring-1 ring-amber-200',
+  RETIRED:     'bg-gray-100    text-gray-600     ring-1 ring-gray-200',
+  OFF_DUTY:    'bg-gray-100    text-gray-600     ring-1 ring-gray-200',
+  SUSPENDED:   'bg-red-50      text-red-700      ring-1 ring-red-200',
+  DRAFT:       'bg-gray-100    text-gray-600     ring-1 ring-gray-200',
+  DISPATCHED:  'bg-blue-50     text-blue-700     ring-1 ring-blue-200',
+  COMPLETED:   'bg-emerald-50  text-emerald-700  ring-1 ring-emerald-200',
+  CANCELLED:   'bg-red-50      text-red-700      ring-1 ring-red-200',
+  ACTIVE:      'bg-amber-50    text-amber-700    ring-1 ring-amber-200',
 }
 
-export const VEHICLE_TYPES = ['VAN', 'TRUCK', 'BUS', 'BIKE', 'CAR', 'TRAILER']
-export const LICENSE_CATEGORIES = ['A', 'B', 'C', 'D', 'E']
-export const MAINTENANCE_TYPES = ['OIL_CHANGE', 'TYRE_REPLACEMENT', 'BRAKE_SERVICE', 'ENGINE_REPAIR', 'GENERAL_SERVICE', 'BODY_REPAIR', 'OTHER']
-export const EXPENSE_TYPES = ['TOLL', 'PARKING', 'INSURANCE', 'FINE', 'OTHER']
+export const VEHICLE_TYPES       = ['VAN', 'TRUCK', 'BUS', 'BIKE', 'CAR', 'TRAILER']
+export const LICENSE_CATEGORIES  = ['A', 'B', 'C', 'D', 'E']
+export const MAINTENANCE_TYPES   = ['OIL_CHANGE', 'TYRE_REPLACEMENT', 'BRAKE_SERVICE', 'ENGINE_REPAIR', 'GENERAL_SERVICE', 'BODY_REPAIR', 'OTHER']
+export const EXPENSE_TYPES       = ['TOLL', 'PARKING', 'INSURANCE', 'FINE', 'OTHER']

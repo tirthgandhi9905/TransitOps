@@ -54,6 +54,32 @@ function UserForm({ form, onChange, errors, roles, isEdit }) {
   )
 }
 
+// Role badge — light-mode solid colors
+function RoleBadge({ name }) {
+  const colors = {
+    'Admin':             'bg-red-50     text-red-700     ring-1 ring-red-200',
+    'Fleet Manager':     'bg-brand-50   text-brand-700   ring-1 ring-brand-200',
+    'Dispatcher':        'bg-blue-50    text-blue-700    ring-1 ring-blue-200',
+    'Safety Officer':    'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200',
+    'Financial Analyst': 'bg-amber-50   text-amber-700   ring-1 ring-amber-200',
+  }
+  return (
+    <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium ${colors[name] || 'bg-gray-100 text-gray-600 ring-1 ring-gray-200'}`}>
+      <ShieldCheck size={10} />
+      {name}
+    </span>
+  )
+}
+
+// Role summary card color bars
+const ROLE_COLORS = {
+  'Admin':             'bg-red-500',
+  'Fleet Manager':     'bg-brand-600',
+  'Dispatcher':        'bg-blue-500',
+  'Safety Officer':    'bg-emerald-500',
+  'Financial Analyst': 'bg-amber-500',
+}
+
 export default function Users() {
   const [showAdd,  setShowAdd]  = useState(false)
   const [editing,  setEditing]  = useState(null)
@@ -76,12 +102,15 @@ export default function Users() {
 
   const setField = (k, v) => setForm(f => ({ ...f, [k]: v }))
 
+  const getRoleName = (u) =>
+    typeof u.role === 'object' ? u.role?.name : (u.role || u.roleName)
+
   const validate = () => {
     const e = {}
-    if (!form.name.trim())    e.name    = 'Required'
-    if (!form.email.trim())   e.email   = 'Required'
-    if (!editing && !form.password) e.password = 'Required'
-    if (!form.roleId)         e.roleId  = 'Required'
+    if (!form.name.trim())              e.name     = 'Required'
+    if (!form.email.trim())             e.email    = 'Required'
+    if (!editing && !form.password)     e.password = 'Required'
+    if (!form.roleId)                   e.roleId   = 'Required'
     setErrors(e)
     return !Object.keys(e).length
   }
@@ -100,9 +129,9 @@ export default function Users() {
     setSaving(true); setApiErr('')
     try {
       const payload = {
-        name:     form.name,
-        email:    form.email,
-        roleId:   form.roleId,
+        name:   form.name,
+        email:  form.email,
+        roleId: form.roleId,
         ...(form.password ? { password: form.password } : {}),
       }
       if (editing) {
@@ -131,40 +160,23 @@ export default function Users() {
     } finally { setDelLoad(false) }
   }
 
-  // Role name badge
-  const RoleBadge = ({ name }) => {
-    const colors = {
-      'Admin':             'bg-red-500/15 text-red-400',
-      'Fleet Manager':     'bg-indigo-500/15 text-indigo-400',
-      'Dispatcher':        'bg-blue-500/15 text-blue-400',
-      'Safety Officer':    'bg-emerald-500/15 text-emerald-400',
-      'Financial Analyst': 'bg-amber-500/15 text-amber-400',
-    }
-    return (
-      <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium ${colors[name] || 'bg-slate-500/15 text-slate-400'}`}>
-        <ShieldCheck size={10} />
-        {name}
-      </span>
-    )
-  }
-
   const columns = [
     {
       key: 'name', label: 'User', sortable: true,
       render: (v, r) => (
         <div>
-          <p className="text-slate-200 font-medium">{v}</p>
-          <p className="text-xs text-slate-500">{r.email}</p>
+          <p className="text-gray-900 font-medium">{v}</p>
+          <p className="text-xs text-gray-400">{r.email}</p>
         </div>
       )
     },
     {
       key: 'role', label: 'Role',
-      render: (_, r) => <RoleBadge name={typeof r.role === "object" ? r.role?.name : (r.role || r.roleName)} />
+      render: (_, r) => <RoleBadge name={getRoleName(r)} />
     },
     {
       key: 'createdAt', label: 'Created',
-      render: v => <span className="text-slate-400 text-xs">{formatDate(v)}</span>
+      render: v => <span className="text-gray-400 text-xs tabular-nums">{formatDate(v)}</span>
     },
     {
       key: '_actions', label: '',
@@ -176,7 +188,7 @@ export default function Users() {
           <Button
             size="icon" variant="ghost"
             onClick={() => setDeleting(row)}
-            className="hover:text-red-400"
+            className="text-gray-400 hover:text-red-500 hover:bg-red-50"
           >
             <Trash2 size={14} />
           </Button>
@@ -185,31 +197,34 @@ export default function Users() {
     }
   ]
 
+  const ROLE_LABELS = ['Admin', 'Fleet Manager', 'Dispatcher', 'Safety Officer', 'Financial Analyst']
+
   return (
     <div className="space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div>
-          <p className="text-slate-400 text-sm">Manage system users and role assignments.</p>
-        </div>
+        <p className="text-gray-500 text-sm">Manage system users and role assignments.</p>
         <Button onClick={openAdd}><Plus size={15} /> Add User</Button>
       </div>
 
-      {/* Roles summary */}
-      <div className="grid grid-cols-5 gap-3">
-        {['Admin', 'Fleet Manager', 'Dispatcher', 'Safety Officer', 'Financial Analyst'].map(role => {
-          const count = users.filter(u => (typeof u.role === "object" ? u.role?.name : (u.role || u.roleName)) === role).length
+      {/* Role summary cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+        {ROLE_LABELS.map(role => {
+          const count = users.filter(u => getRoleName(u) === role).length
           return (
-            <div key={role} className="bg-slate-900 border border-slate-800 rounded-lg px-3 py-2.5">
-              <p className="text-xs text-slate-500 truncate">{role}</p>
-              <p className="text-lg font-bold text-slate-100 mt-0.5">{count}</p>
+            <div key={role} className="bg-white border border-surface-border rounded-xl shadow-card overflow-hidden">
+              <div className={`h-0.5 w-full ${ROLE_COLORS[role] || 'bg-gray-300'}`} />
+              <div className="px-3 py-2.5">
+                <p className="text-xs text-gray-500 truncate">{role}</p>
+                <p className="text-xl font-bold text-gray-900 mt-0.5 tabular-nums">{count}</p>
+              </div>
             </div>
           )
         })}
       </div>
 
       {/* Table */}
-      <div className="bg-slate-900 border border-slate-800 rounded-xl">
+      <div className="bg-white border border-surface-border rounded-xl shadow-card overflow-hidden">
         <Table
           columns={columns} data={users} loading={loading}
           emptyMessage="No users found."
@@ -225,7 +240,7 @@ export default function Users() {
         size="md"
       >
         {apiErr && (
-          <div className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+          <div className="mb-4 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm">
             {apiErr}
           </div>
         )}
@@ -233,7 +248,7 @@ export default function Users() {
           form={form} onChange={setField}
           errors={errors} roles={roles} isEdit={!!editing}
         />
-        <div className="flex justify-end gap-2 mt-6">
+        <div className="flex justify-end gap-2 mt-6 pt-4 border-t border-surface-border">
           <Button variant="secondary" onClick={() => { setShowAdd(false); setEditing(null) }}>
             Cancel
           </Button>

@@ -1,54 +1,61 @@
 import React from 'react'
 import { useLocation } from 'react-router-dom'
-import { Menu, Bell, LogOut } from 'lucide-react'
+import { Bell, LogOut } from 'lucide-react'
 import useAuth from '../../hooks/useAuth'
 
-const PAGE_TITLES = {
-  '/dashboard':   'Dashboard',
-  '/vehicles':    'Vehicle Registry',
-  '/drivers':     'Driver Management',
-  '/trips':       'Trip Management',
-  '/maintenance': 'Maintenance',
-  '/fuel':        'Fuel & Expenses',
-  '/reports':     'Reports & Analytics',
+const PAGE_META = {
+  '/dashboard':   { title: 'Dashboard',          sub: 'Fleet overview & KPIs' },
+  '/vehicles':    { title: 'Vehicle Registry',    sub: 'Manage your fleet assets' },
+  '/drivers':     { title: 'Driver Management',   sub: 'Driver profiles & compliance' },
+  '/trips':       { title: 'Trip Management',     sub: 'Dispatch & track deliveries' },
+  '/maintenance': { title: 'Maintenance',         sub: 'Service logs & scheduling' },
+  '/fuel':        { title: 'Fuel & Expenses',     sub: 'Operational cost tracking' },
+  '/reports':     { title: 'Reports & Analytics', sub: 'Performance insights' },
+  '/users':       { title: 'User Management',     sub: 'Accounts & roles' },
 }
 
 export default function Topbar({ onMenuClick }) {
   const { user, logoutUser } = useAuth()
   const location = useLocation()
-  const title = PAGE_TITLES[location.pathname] || 'TransitOps'
+  const meta = PAGE_META[location.pathname] || { title: 'TransitOps', sub: '' }
 
   return (
-    <header className="h-16 bg-slate-900 border-b border-slate-800 flex items-center justify-between px-4 flex-shrink-0">
-      <div className="flex items-center gap-3">
-        <button
-          onClick={onMenuClick}
-          className="p-2 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-colors"
-        >
-          <Menu size={18} />
-        </button>
-        <h1 className="text-slate-100 font-semibold text-base">{title}</h1>
+    <header className="h-16 bg-white border-b border-surface-border flex items-center justify-between px-5 flex-shrink-0">
+      {/* Left: Page title */}
+      <div className="flex items-center gap-4 min-w-0">
+        <div className="min-w-0">
+          <h1 className="text-gray-900 font-semibold text-[15px] leading-tight truncate">{meta.title}</h1>
+          {meta.sub && (
+            <p className="text-gray-400 text-xs leading-tight hidden sm:block">{meta.sub}</p>
+          )}
+        </div>
       </div>
 
-      <div className="flex items-center gap-2">
-        <button className="p-2 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-colors">
-          <Bell size={18} />
+      {/* Right: actions */}
+      <div className="flex items-center gap-1">
+        <button
+          className="p-2 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+          title="Notifications"
+        >
+          <Bell size={17} />
         </button>
 
-        <div className="flex items-center gap-2 pl-2 border-l border-slate-700">
+        <div className="w-px h-5 bg-surface-border mx-1" />
+
+        <div className="flex items-center gap-2">
           <div className="text-right hidden sm:block">
-            <p className="text-slate-200 text-sm font-medium leading-none">{user?.name}</p>
-            <p className="text-slate-500 text-xs mt-0.5">{user?.role}</p>
+            <p className="text-gray-800 text-xs font-semibold leading-none">{user?.name}</p>
+            <p className="text-gray-400 text-xs mt-0.5 leading-none">{user?.role}</p>
           </div>
-          <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white text-sm font-bold">
+          <div className="w-8 h-8 rounded-full bg-brand-600 flex items-center justify-center text-white text-sm font-bold">
             {user?.name?.[0]?.toUpperCase() || '?'}
           </div>
           <button
             onClick={logoutUser}
-            className="p-2 rounded-lg text-slate-400 hover:text-red-400 hover:bg-slate-800 transition-colors"
-            title="Logout"
+            className="p-2 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+            title="Sign out"
           >
-            <LogOut size={16} />
+            <LogOut size={15} />
           </button>
         </div>
       </div>
