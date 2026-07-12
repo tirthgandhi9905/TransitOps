@@ -8,6 +8,7 @@ import Modal         from '../components/ui/Modal'
 import ConfirmDialog from '../components/ui/ConfirmDialog'
 import FormField, { Input, Select, Textarea } from '../components/ui/FormField'
 import useApi        from '../hooks/useApi'
+import { toast } from '../hooks/useToast'
 import useAuth       from '../hooks/useAuth'
 import {
   listMaintenance, createMaintenance,
@@ -136,14 +137,16 @@ export default function Maintenance() {
         cost: form.cost ? parseFloat(form.cost) : undefined,
       })
       setShowAdd(false); refetch()
+      toast('Maintenance record created. Vehicle is now In Shop.', 'success')
     } catch (err) {
-      setApiErr(err.response?.data?.error?.message || 'Failed to create record')
+      const msg = err.response?.data?.error?.message || 'Failed to create record'
+      setApiErr(msg); toast(msg, 'error')
     } finally { setSaving(false) }
   }
 
   const handleClose = async () => {
     setCloseLoad(true)
-    try { await closeMaintenance(closing.id); setClosing(null); refetch() }
+    try { await closeMaintenance(closing.id); setClosing(null); refetch(); toast('Maintenance closed. Vehicle restored to Available.', 'success') }
     catch { setClosing(null) }
     finally { setCloseLoad(false) }
   }

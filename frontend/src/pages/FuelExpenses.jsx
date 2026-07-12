@@ -6,6 +6,7 @@ import Modal         from '../components/ui/Modal'
 import ConfirmDialog from '../components/ui/ConfirmDialog'
 import FormField, { Input, Select, Textarea } from '../components/ui/FormField'
 import useApi        from '../hooks/useApi'
+import { toast } from '../hooks/useToast'
 import useAuth       from '../hooks/useAuth'
 import { listFuel, createFuel, deleteFuel, listExpenses, createExpense, deleteExpense } from '../api/fuel_expenses'
 import { listVehicles } from '../api/vehicles'
@@ -195,9 +196,10 @@ export default function FuelExpenses() {
         fuelStation: fuelForm.fuelStation || undefined,
         date:        fuelForm.date,
       })
-      setShowFuel(false); refetchFuel()
+      setShowFuel(false); refetchFuel(); toast('Fuel log saved.', 'success')
     } catch (err) {
-      setFuelApiErr(err.response?.data?.error?.message || 'Save failed')
+      const fmsg = err.response?.data?.error?.message || 'Save failed'
+      setFuelApiErr(fmsg); toast(fmsg, 'error')
     } finally { setFuelSaving(false) }
   }
   const handleDelFuel = async () => {
@@ -233,9 +235,10 @@ export default function FuelExpenses() {
         description: expForm.description || undefined,
         expenseDate: expForm.expenseDate,
       })
-      setShowExp(false); refetchExp()
+      setShowExp(false); refetchExp(); toast('Expense saved.', 'success')
     } catch (err) {
-      setExpApiErr(err.response?.data?.error?.message || 'Save failed')
+      const emsg = err.response?.data?.error?.message || 'Save failed'
+      setExpApiErr(emsg); toast(emsg, 'error')
     } finally { setExpSaving(false) }
   }
   const handleDelExp = async () => {

@@ -8,6 +8,7 @@ import Modal         from '../components/ui/Modal'
 import ConfirmDialog from '../components/ui/ConfirmDialog'
 import FormField, { Input, Select } from '../components/ui/FormField'
 import useApi        from '../hooks/useApi'
+import { toast } from '../hooks/useToast'
 import useAuth       from '../hooks/useAuth'
 import { listDrivers, createDriver, updateDriver, deleteDriver } from '../api/drivers'
 import { DRIVER_STATUS, LICENSE_CATEGORIES } from '../utils/constants'
@@ -130,7 +131,8 @@ export default function DriverManagement() {
       editing ? await updateDriver(editing.id, form) : await createDriver(form)
       setShowAdd(false); setEditing(null); refetch()
     } catch(err) {
-      setApiErr(err.response?.data?.error?.message || 'Save failed')
+      const msg = err.response?.data?.error?.message || 'Save failed'
+      setApiErr(msg); toast(msg, 'error')
     } finally { setSaving(false) }
   }
 

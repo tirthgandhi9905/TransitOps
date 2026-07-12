@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Truck } from 'lucide-react'
 import { login } from '../api/auth'
+import { toast } from '../hooks/useToast'
 import useAuth from '../hooks/useAuth'
 
 export default function Login() {

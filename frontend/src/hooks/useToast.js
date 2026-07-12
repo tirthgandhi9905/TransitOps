@@ -1,17 +1,26 @@
-import { useState, useCallback } from 'react'
+import { createContext, useContext, useState, useCallback } from 'react'
 
-let _addToast = null
+// Module-level setter — populated once ToastProvider mounts
+let _dispatch = null
+
+// Call this from anywhere — pages, api error handlers, etc.
+export function toast(message, type = 'info') {
+  if (_dispatch) _dispatch(message, type)
+}
+
+export const ToastContext = createContext(null)
 
 export function useToastProvider() {
   const [toasts, setToasts] = useState([])
 
   const addToast = useCallback((message, type = 'info') => {
-    const id = Date.now()
+    const id = Date.now() + Math.random()
     setToasts(prev => [...prev, { id, message, type }])
     setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 4000)
   }, [])
 
-  _addToast = addToast
+  // Wire the global shortcut
+  _dispatch = addToast
 
   const removeToast = useCallback((id) => {
     setToasts(prev => prev.filter(t => t.id !== id))
@@ -20,17 +29,7 @@ export function useToastProvider() {
   return { toasts, addToast, removeToast }
 }
 
-export function toast(message, type = 'info') {
-  if (_addToast) _addToast(message, type)
-}
-
+// Hook for components that need addToast directly
 export default function useToast() {
-  const [toasts, setToasts] = useState([])
-  const addToast = useCallback((message, type = 'info') => {
-    const id = Date.now()
-    setToasts(prev => [...prev, { id, message, type }])
-    setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 4000)
-  }, [])
-  const removeToast = useCallback((id) => setToasts(prev => prev.filter(t => t.id !== id)), [])
-  return { toasts, addToast, removeToast }
+  return useContext(ToastContext)
 }

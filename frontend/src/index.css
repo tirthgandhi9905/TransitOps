@@ -2,12 +2,32 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Custom scrollbars and styling tweaks can be placed here */
+/* ── Base ── */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { height: 100%; }
+
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  height: 100%;
+  background-color: #0f172a;   /* slate-950 */
+  color: #e2e8f0;              /* slate-200 */
+  font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI',
+    Roboto, Oxygen, Ubuntu, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+#root { height: 100%; }
+
+/* ── Custom scrollbar (WebKit) ── */
+::-webkit-scrollbar              { width: 6px; height: 6px; }
+::-webkit-scrollbar-track        { background: transparent; }
+::-webkit-scrollbar-thumb        { background: #334155; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover  { background: #475569; }
+
+/* ── Firefox scrollbar ── */
+* { scrollbar-width: thin; scrollbar-color: #334155 transparent; }
+
+/* ── Recharts tweaks — remove default white background ── */
+.recharts-default-tooltip { background: #1e293b !important; border: 1px solid #334155 !important; }

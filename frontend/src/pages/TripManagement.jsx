@@ -10,6 +10,7 @@ import Modal         from '../components/ui/Modal'
 import ConfirmDialog from '../components/ui/ConfirmDialog'
 import FormField, { Input, Select, Textarea } from '../components/ui/FormField'
 import useApi        from '../hooks/useApi'
+import { toast } from '../hooks/useToast'
 import useAuth       from '../hooks/useAuth'
 import {
   listTrips, createTrip, dispatchTrip,
@@ -317,28 +318,30 @@ export default function TripManagement() {
         notes:           form.notes || undefined,
       })
       setShowCreate(false); refetch()
+      toast('Trip created successfully.', 'success')
     } catch(err) {
-      setApiErr(err.response?.data?.error?.message || 'Failed to create trip')
+      const msg = err.response?.data?.error?.message || 'Failed to create trip'
+      setApiErr(msg); toast(msg, 'error')
     } finally { setSaving(false) }
   }
 
   const handleDispatch = async () => {
     setDispatchLoad(true)
-    try { await dispatchTrip(dispatching.id); setDispatching(null); refetch() }
+    try { await dispatchTrip(dispatching.id); setDispatching(null); refetch(); toast('Trip dispatched.', 'success') }
     catch { setDispatching(null) }
     finally { setDispatchLoad(false) }
   }
 
   const handleComplete = async (data) => {
     setCompLoading(true)
-    try { await completeTrip(completing.id, data); setCompleting(null); refetch() }
+    try { await completeTrip(completing.id, data); setCompleting(null); refetch(); toast('Trip completed.', 'success') }
     catch { }
     finally { setCompLoading(false) }
   }
 
   const handleCancel = async () => {
     setCancelLoad(true)
-    try { await cancelTrip(cancelling.id); setCancelling(null); refetch() }
+    try { await cancelTrip(cancelling.id); setCancelling(null); refetch(); toast('Trip cancelled.', 'warning') }
     catch { setCancelling(null) }
     finally { setCancelLoad(false) }
   }
