@@ -95,7 +95,7 @@ export default function Login() {
           ))}
         </div>
 
-        <p className="text-brand-300 text-xs">© 2024 TransitOps. Built for hackathon.</p>
+        <p className="text-brand-300 text-xs">© 2026 TransitOps. Built for hackathon.</p>
       </div>
 
       {/* Right panel — form */}
