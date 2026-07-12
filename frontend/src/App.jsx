@@ -6,10 +6,7 @@ import { useToastProvider } from './hooks/useToast'
 import ToastContainer       from './components/ui/Toast'
 import useAuth              from './hooks/useAuth'
 
-// Layout
-import AppLayout from './components/layout/AppLayout'
-
-// Pages
+import AppLayout        from './components/layout/AppLayout'
 import Login            from './pages/Login'
 import Dashboard        from './pages/Dashboard'
 import VehicleRegistry  from './pages/VehicleRegistry'
@@ -18,8 +15,8 @@ import TripManagement   from './pages/TripManagement'
 import Maintenance      from './pages/Maintenance'
 import FuelExpenses     from './pages/FuelExpenses'
 import Reports          from './pages/Reports'
+import Users            from './pages/Users'
 
-// ─── Loading spinner shown during JWT re-hydration ───────────────────────────
 function Spinner() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-slate-950">
@@ -31,7 +28,6 @@ function Spinner() {
   )
 }
 
-// ─── Guards ──────────────────────────────────────────────────────────────────
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
   if (loading) return <Spinner />
@@ -39,27 +35,12 @@ function ProtectedRoute({ children }) {
   return children
 }
 
-// ─── Route tree ──────────────────────────────────────────────────────────────
 function AppRoutes() {
   const { user } = useAuth()
-
   return (
     <Routes>
-      {/* Public */}
-      <Route
-        path="/login"
-        element={user ? <Navigate to="/dashboard" replace /> : <Login />}
-      />
-
-      {/* Protected shell */}
-      <Route
-        path="/"
-        element={
-          <ProtectedRoute>
-            <AppLayout />
-          </ProtectedRoute>
-        }
-      >
+      <Route path="/login" element={user ? <Navigate to="/dashboard" replace /> : <Login />} />
+      <Route path="/" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
         <Route index                  element={<Navigate to="/dashboard" replace />} />
         <Route path="dashboard"       element={<Dashboard />} />
         <Route path="vehicles"        element={<VehicleRegistry />} />
@@ -68,15 +49,13 @@ function AppRoutes() {
         <Route path="maintenance"     element={<Maintenance />} />
         <Route path="fuel"            element={<FuelExpenses />} />
         <Route path="reports"         element={<Reports />} />
+        <Route path="users"           element={<Users />} />
       </Route>
-
-      {/* Catch-all */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )
 }
 
-// ─── Toast provider wrapper (must be inside BrowserRouter) ───────────────────
 function ToastProvider({ children }) {
   const { toasts, addToast, removeToast } = useToastProvider()
   return (
@@ -87,7 +66,6 @@ function ToastProvider({ children }) {
   )
 }
 
-// ─── Root ─────────────────────────────────────────────────────────────────────
 export default function App() {
   return (
     <BrowserRouter>
