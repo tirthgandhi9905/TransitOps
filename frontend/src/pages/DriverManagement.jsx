@@ -1,10 +1,10 @@
-import React from 'react';
+import React from 'react'
 
 export default function DriverManagement() {
   return (
-    <div className="p-6 bg-slate-950 text-white min-h-screen">
-      <h1 className="text-3xl font-bold mb-6">Driver Management</h1>
-      <p className="text-slate-400">Track licensing compliance and driver duty statuses.</p>
+    <div className="text-slate-400 p-4">
+      <h2 className="text-xl font-semibold text-slate-100 mb-2">DriverManagement</h2>
+      <p>Coming in next commit…</p>
     </div>
-  );
+  )
 }

@@ -1,20 +1,11 @@
-import client from './client';
+import client from './client'
 
-export const listTrips = (filters = {}) => 
-  client.get('/api/trips', { params: filters }).then(res => res.data);
-
-export const createTrip = (data) => 
-  client.post('/api/trips', data).then(res => res.data);
-
-export const dispatchTrip = (id) => 
-  client.post(`/api/trips/${id}/dispatch`).then(res => res.data);
-
-export const completeTrip = (id, actualDistance, fuelConsumed, fuelCostPerLiter = 1.50) => 
-  client.post(`/api/trips/${id}/complete`, { 
-    actual_distance: actualDistance, 
-    fuel_consumed: fuelConsumed,
-    fuel_cost_per_liter: fuelCostPerLiter
-  }).then(res => res.data);
-
-export const cancelTrip = (id) => 
-  client.post(`/api/trips/${id}/cancel`).then(res => res.data);
+export const listTrips    = (params = {}) => client.get('/api/trips', { params }).then(r => r.data)
+export const getTrip      = (id)          => client.get(`/api/trips/${id}`).then(r => r.data)
+export const createTrip   = (data)        => client.post('/api/trips', data).then(r => r.data)
+export const updateTrip   = (id, data)    => client.put(`/api/trips/${id}`, data).then(r => r.data)
+export const deleteTrip   = (id)          => client.delete(`/api/trips/${id}`).then(r => r.data)
+export const dispatchTrip = (id)          => client.post(`/api/trips/${id}/dispatch`).then(r => r.data)
+export const completeTrip = (id, data)    => client.post(`/api/trips/${id}/complete`, data).then(r => r.data)
+export const cancelTrip   = (id)          => client.post(`/api/trips/${id}/cancel`).then(r => r.data)
+export const exportTripsCsv = ()          => client.get('/api/export/trips/csv', { responseType: 'blob' }).then(r => r.data)
