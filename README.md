@@ -187,7 +187,3 @@ A few things that didn't fit in 8 hours but are worth noting:
 - **Vehicle document management** — attaching insurance, registration, and PUC certificates per vehicle
 - **Dark mode** — Tailwind's `dark:` variants are already in the config, the CSS variables just need a second set of values
 - **Offline support** — trip creation and completion are the two flows that matter most when drivers are in areas with poor connectivity
-
----
-
-Built for the TransitOps Hackathon · 8-hour build · 3-person team
